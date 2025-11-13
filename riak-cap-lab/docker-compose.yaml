@@ -1,0 +1,33 @@
+services:
+  coordinator:
+    image: basho/riak-kv
+    ports:
+      - "8098:8098"
+      - "8087:8087" 
+    environment:
+      - CLUSTER_NAME=riakkv
+    labels:
+      - "com.basho.riak.cluster.name=riakkv"
+    networks:
+      - riak-net
+  
+  member:
+    image: basho/riak-kv
+    ports:
+      - "8098"
+      - "8087" 
+    labels:
+      - "com.basho.riak.cluster.name=riakkv"
+    links:
+      - coordinator
+    depends_on:
+      - coordinator
+    environment:
+      - CLUSTER_NAME=riakkv
+      - COORDINATOR_NODE=coordinator
+    networks:
+      - riak-net
+
+networks:
+  riak-net:
+    driver: bridge
